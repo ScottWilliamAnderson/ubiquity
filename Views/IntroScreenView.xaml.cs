@@ -44,40 +44,42 @@ namespace Mythic.Views
             this.PreviewKeyDown += IntroScreenView_PreviewKeyDown;
             this.PreviewMouseDown += IntroScreenView_PreviewMouseDown;
             this.PreviewMouseWheel += IntroScreenView_PreviewMouseWheel;
-            
-            // For gamepad support, we'll also handle generic input events
-            // Playnite's input system might trigger these
-            this.PreviewMouseLeftButtonDown += IntroScreenView_PreviewMouseLeftButtonDown;
-            this.PreviewMouseRightButtonDown += IntroScreenView_PreviewMouseRightButtonDown;
         }
 
         private void StartIntroVideo()
         {
             try
             {
-                // Set the video source - assuming it's in the Videos folder of the theme
-                // The path should be relative to the theme directory
-                string videoPath = System.IO.Path.Combine(
-                    System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location),
-                    "Themes", "Fullscreen", "Mythic", "Videos", "Intro.mp4"
-                );
-                
-                // Alternative: Try to get the path from the current directory
-                if (!System.IO.File.Exists(videoPath))
+                // Try multiple paths to locate the intro video
+                string[] possiblePaths = new string[]
                 {
-                    // Try relative path from theme root
-                    videoPath = "Videos/Intro.mp4";
+                    "Videos/Intro.mp4",  // Relative to theme directory (most common)
+                    "Intro.mp4",          // Root of theme directory
+                    System.IO.Path.Combine("Themes", "Fullscreen", "Mythic", "Videos", "Intro.mp4")  // Full relative path
+                };
+                
+                string videoPath = null;
+                foreach (string path in possiblePaths)
+                {
+                    if (System.IO.File.Exists(path))
+                    {
+                        videoPath = path;
+                        break;
+                    }
                 }
                 
-                if (System.IO.File.Exists(videoPath))
+                if (videoPath != null)
                 {
-                    IntroVideo.Source = new Uri(videoPath, UriKind.RelativeOrAbsolute);
+                    // Use absolute path for URI if file exists
+                    string absolutePath = System.IO.Path.GetFullPath(videoPath);
+                    IntroVideo.Source = new Uri(absolutePath, UriKind.Absolute);
                     IntroVideo.Play();
                     isVideoPlaying = true;
                 }
                 else
                 {
                     // Video file not found, skip intro gracefully
+                    System.Diagnostics.Debug.WriteLine("Intro video file not found in any expected location");
                     SkipIntro();
                 }
             }
@@ -114,16 +116,6 @@ namespace Mythic.Views
         }
 
         private void IntroScreenView_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            HandleInputEvent(e);
-        }
-
-        private void IntroScreenView_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            HandleInputEvent(e);
-        }
-
-        private void IntroScreenView_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             HandleInputEvent(e);
         }
@@ -213,8 +205,6 @@ namespace Mythic.Views
             this.PreviewKeyDown -= IntroScreenView_PreviewKeyDown;
             this.PreviewMouseDown -= IntroScreenView_PreviewMouseDown;
             this.PreviewMouseWheel -= IntroScreenView_PreviewMouseWheel;
-            this.PreviewMouseLeftButtonDown -= IntroScreenView_PreviewMouseLeftButtonDown;
-            this.PreviewMouseRightButtonDown -= IntroScreenView_PreviewMouseRightButtonDown;
 
             if (fadeOutStoryboard != null)
             {

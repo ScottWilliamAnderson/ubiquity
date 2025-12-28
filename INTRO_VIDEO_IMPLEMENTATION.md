@@ -62,11 +62,12 @@ This implementation is designed to be integrated into a Playnite fullscreen them
 
 ## Video Path Configuration
 
-The implementation tries two paths for the video file:
-1. Absolute path: `[Assembly Location]/Themes/Fullscreen/Mythic/Videos/Intro.mp4`
-2. Relative path: `Videos/Intro.mp4`
+The implementation tries multiple common paths to locate the video file:
+1. `Videos/Intro.mp4` (relative to theme directory - most common)
+2. `Intro.mp4` (root of theme directory)
+3. `Themes/Fullscreen/Mythic/Videos/Intro.mp4` (full relative path)
 
-If neither file exists, the intro is skipped gracefully.
+The first existing path is used. If no file is found, the intro is skipped gracefully.
 
 ## Gamepad Support
 
@@ -97,7 +98,7 @@ For Playnite-specific gamepad integration, the theme might need additional integ
 Preview events are used instead of regular events because they fire during the tunneling phase of event routing (before regular events). This ensures we capture input before it reaches any child elements or the main Playnite interface.
 
 ### Why Multiple Mouse Handlers?
-Different input systems may route events through different handlers. By handling both `PreviewMouseDown` and the specific button events (`PreviewMouseLeftButtonDown`, `PreviewMouseRightButtonDown`), we ensure maximum compatibility.
+The PreviewMouseDown handler captures all mouse button clicks (left, right, middle), while PreviewMouseWheel handles scroll events separately. This ensures comprehensive coverage of all mouse-based input.
 
 ### Why Focusable and IsHitTestVisible?
 - `Focusable="True"` allows the control to receive keyboard focus and keyboard events
@@ -135,6 +136,4 @@ Potential improvements for future versions:
 
 ## Contact and Support
 
-For issues or questions about this implementation, please refer to:
-- GitHub Repository: https://github.com/ScottWilliamAnderson/ubiquity
-- Original Theme: https://github.com/RedSchism/ubiquity
+For issues or questions about this implementation, please refer to the repository where this theme is hosted.
