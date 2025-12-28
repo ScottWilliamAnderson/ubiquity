@@ -3,7 +3,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
-using System.Windows.Threading;
 
 namespace Mythic.Views
 {
@@ -15,7 +14,6 @@ namespace Mythic.Views
     {
         private bool isVideoPlaying = false;
         private bool isSkipping = false;
-        private DispatcherTimer autoHideTimer;
         private Storyboard fadeOutStoryboard;
 
         public IntroScreenView()
@@ -93,13 +91,14 @@ namespace Mythic.Views
 
         #region Input Event Handlers
 
-        private void IntroScreenView_PreviewKeyDown(object sender, KeyEventArgs e)
+        /// <summary>
+        /// Common handler for all input events - skips intro on first input, blocks all subsequent input
+        /// </summary>
+        private void HandleInputEvent(InputEventArgs e)
         {
             if (isVideoPlaying && !isSkipping)
             {
-                // Any key press should skip the intro
                 SkipIntro();
-                // Mark the event as handled to prevent it from bubbling
                 e.Handled = true;
             }
             else if (isVideoPlaying)
@@ -109,56 +108,29 @@ namespace Mythic.Views
             }
         }
 
+        private void IntroScreenView_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            HandleInputEvent(e);
+        }
+
         private void IntroScreenView_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (isVideoPlaying && !isSkipping)
-            {
-                SkipIntro();
-                e.Handled = true;
-            }
-            else if (isVideoPlaying)
-            {
-                e.Handled = true;
-            }
+            HandleInputEvent(e);
         }
 
         private void IntroScreenView_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (isVideoPlaying && !isSkipping)
-            {
-                SkipIntro();
-                e.Handled = true;
-            }
-            else if (isVideoPlaying)
-            {
-                e.Handled = true;
-            }
+            HandleInputEvent(e);
         }
 
         private void IntroScreenView_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (isVideoPlaying && !isSkipping)
-            {
-                SkipIntro();
-                e.Handled = true;
-            }
-            else if (isVideoPlaying)
-            {
-                e.Handled = true;
-            }
+            HandleInputEvent(e);
         }
 
         private void IntroScreenView_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            if (isVideoPlaying && !isSkipping)
-            {
-                SkipIntro();
-                e.Handled = true;
-            }
-            else if (isVideoPlaying)
-            {
-                e.Handled = true;
-            }
+            HandleInputEvent(e);
         }
 
         #endregion
@@ -235,13 +207,6 @@ namespace Mythic.Views
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error cleaning up video: {ex.Message}");
-            }
-
-            // Clean up timer if it exists
-            if (autoHideTimer != null)
-            {
-                autoHideTimer.Stop();
-                autoHideTimer = null;
             }
 
             // Unsubscribe from events to prevent memory leaks
