@@ -25,9 +25,9 @@ C# code-behind with comprehensive input handling:
 
 ### Input Handling
 ✅ **Keyboard inputs blocked** - PreviewKeyDown event handler  
-✅ **Mouse clicks blocked** - PreviewMouseDown, PreviewMouseLeftButtonDown, PreviewMouseRightButtonDown handlers  
+✅ **Mouse clicks blocked** - PreviewMouseDown event handler (captures all mouse buttons)  
 ✅ **Mouse wheel blocked** - PreviewMouseWheel handler  
-✅ **Gamepad inputs blocked** - Uses defensive approach with multiple event handlers to catch gamepad-triggered events  
+✅ **Gamepad inputs blocked** - Uses defensive approach to catch gamepad-triggered events  
 
 ### Skip Functionality
 ✅ **Any button skips** - First input triggers skip, subsequent inputs are ignored  
@@ -40,7 +40,6 @@ C# code-behind with comprehensive input handling:
 
 ### Resource Management
 ✅ **Proper cleanup** - Video source cleared, MediaElement closed  
-✅ **Timer disposal** - Dispatcher timers stopped and nulled  
 ✅ **Event unsubscription** - All event handlers removed to prevent memory leaks  
 ✅ **Graceful failures** - Try-catch blocks around critical operations  
 

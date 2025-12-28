@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
+using System.Windows.Threading;
 
 namespace Mythic.Views
 {
@@ -28,7 +29,8 @@ namespace Mythic.Views
         private void IntroScreenView_Loaded(object sender, RoutedEventArgs e)
         {
             // Set focus to this control to ensure we capture all input
-            this.Focus();
+            // Use Dispatcher to ensure the visual tree is fully loaded
+            this.Dispatcher.BeginInvoke(new Action(() => this.Focus()), System.Windows.Threading.DispatcherPriority.Input);
             
             // Get the fade-out animation from resources
             fadeOutStoryboard = (Storyboard)this.Resources["FadeOutAnimation"];
