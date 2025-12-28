@@ -32,14 +32,18 @@
                      MediaFailed="IntroVideo_MediaFailed"
                      Volume="1.0" />
         
-        <!-- Skip Hint Text -->
-        <TextBlock x:Name="SkipHint"
-                  Text="Press any button to skip"
-                  Foreground="White"
-                  FontSize="18"
-                  Opacity="0.6"
-                  HorizontalAlignment="Right"
-                  VerticalAlignment="Bottom"
-                  Margin="0,0,40,40" />
+        <!-- Skip Hint Text with Background -->
+        <Border HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                Margin="20"
+                Background="#40000000"
+                Padding="10,5"
+                CornerRadius="4">
+            <TextBlock x:Name="SkipHint"
+                      Text="Press any button to skip"
+                      Foreground="White"
+                      FontSize="14"
+                      Opacity="0.9" />
+        </Border>
     </Grid>
 </UserControl>

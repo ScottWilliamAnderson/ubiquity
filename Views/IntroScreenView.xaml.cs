@@ -15,6 +15,7 @@ namespace Mythic.Views
     {
         private bool isVideoPlaying = false;
         private bool isSkipping = false;
+        private bool isHiding = false;
         private Storyboard fadeOutStoryboard;
 
         public IntroScreenView()
@@ -46,6 +47,16 @@ namespace Mythic.Views
             this.PreviewKeyDown += IntroScreenView_PreviewKeyDown;
             this.PreviewMouseDown += IntroScreenView_PreviewMouseDown;
             this.PreviewMouseWheel += IntroScreenView_PreviewMouseWheel;
+            
+            // Add low-level input handling for gamepad support
+            try
+            {
+                InputManager.Current.PreProcessInput += OnPreProcessInput;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Could not register PreProcessInput handler: {ex.Message}");
+            }
         }
 
         private void StartIntroVideo()
@@ -94,6 +105,36 @@ namespace Mythic.Views
         }
 
         #region Input Event Handlers
+
+        /// <summary>
+        /// Low-level input handler for capturing gamepad and other input devices
+        /// This catches input before it's processed by the WPF event system
+        /// </summary>
+        private void OnPreProcessInput(object sender, PreProcessInputEventArgs e)
+        {
+            if (!isVideoPlaying || isSkipping)
+            {
+                return;
+            }
+
+            var inputEventArgs = e.StagingItem.Input;
+            
+            // Check for any input device activity (including gamepad)
+            // This is a defensive approach that works with Playnite's input routing
+            if (inputEventArgs is KeyEventArgs || 
+                inputEventArgs is MouseEventArgs ||
+                inputEventArgs.Device != null)
+            {
+                // If this is a gamepad or other non-standard input device
+                var deviceType = inputEventArgs.Device?.GetType().Name ?? "";
+                if (deviceType.Contains("Gamepad") || deviceType.Contains("Joystick"))
+                {
+                    // Skip the intro on gamepad input
+                    this.Dispatcher.BeginInvoke(new Action(() => SkipIntro()), DispatcherPriority.Input);
+                    e.Cancel();
+                }
+            }
+        }
 
         /// <summary>
         /// Common handler for all input events - skips intro on first input, blocks all subsequent input
@@ -190,6 +231,13 @@ namespace Mythic.Views
 
         private void HideIntroScreen()
         {
+            if (isHiding)
+            {
+                // Prevent multiple calls (race condition between MediaEnded and timer/other events)
+                return;
+            }
+            
+            isHiding = true;
             isVideoPlaying = false;
 
             // Clean up the video source
@@ -207,6 +255,16 @@ namespace Mythic.Views
             this.PreviewKeyDown -= IntroScreenView_PreviewKeyDown;
             this.PreviewMouseDown -= IntroScreenView_PreviewMouseDown;
             this.PreviewMouseWheel -= IntroScreenView_PreviewMouseWheel;
+            
+            // Unsubscribe from low-level input handler
+            try
+            {
+                InputManager.Current.PreProcessInput -= OnPreProcessInput;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error unsubscribing from PreProcessInput: {ex.Message}");
+            }
 
             if (fadeOutStoryboard != null)
             {
