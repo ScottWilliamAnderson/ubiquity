@@ -79,7 +79,7 @@ This implementation provides comprehensive gamepad support through multiple laye
 - **Device Type Detection**: Checks for "Gamepad" or "Joystick" in device type name
 - **Cancel + Skip**: Cancels the input event and triggers skip on gamepad detection
 
-The InputManager handler works with Playnate's input routing system to ensure gamepad inputs are properly captured and blocked during video playback.
+The InputManager handler works with Playnite's input routing system to ensure gamepad inputs are properly captured and blocked during video playback.
 
 For Playnite-specific gamepad integration, the theme might need additional integration with Playnite's SDK, but this implementation provides maximum compatibility with standard input systems.
 

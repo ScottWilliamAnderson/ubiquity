@@ -129,9 +129,9 @@ namespace Mythic.Views
                 var deviceType = inputEventArgs.Device?.GetType().Name ?? "";
                 if (deviceType.Contains("Gamepad") || deviceType.Contains("Joystick"))
                 {
-                    // Skip the intro on gamepad input
+                    // Skip the intro on gamepad input and mark as handled
+                    inputEventArgs.Handled = true;
                     this.Dispatcher.BeginInvoke(new Action(() => SkipIntro()), DispatcherPriority.Input);
-                    e.Cancel();
                 }
             }
         }
