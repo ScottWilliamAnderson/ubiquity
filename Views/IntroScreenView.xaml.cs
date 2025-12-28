@@ -109,6 +109,7 @@ namespace Mythic.Views
         /// <summary>
         /// Low-level input handler for capturing gamepad and other input devices
         /// This catches input before it's processed by the WPF event system
+        /// Specifically handles gamepad/joystick inputs that might not trigger standard Preview events
         /// </summary>
         private void OnPreProcessInput(object sender, PreProcessInputEventArgs e)
         {
@@ -119,17 +120,17 @@ namespace Mythic.Views
 
             var inputEventArgs = e.StagingItem.Input;
             
-            // Check for any input device activity (including gamepad)
-            // This is a defensive approach that works with Playnite's input routing
-            if (inputEventArgs is KeyEventArgs || 
-                inputEventArgs is MouseEventArgs ||
-                inputEventArgs.Device != null)
+            // Only handle gamepad/joystick devices here (keyboard/mouse handled by Preview events)
+            // Check device type to avoid duplicating Preview event handling
+            if (inputEventArgs.Device != null)
             {
-                // If this is a gamepad or other non-standard input device
-                var deviceType = inputEventArgs.Device?.GetType().Name ?? "";
-                if (deviceType.Contains("Gamepad") || deviceType.Contains("Joystick"))
+                var deviceType = inputEventArgs.Device.GetType().Name;
+                
+                // Only process gamepad/joystick inputs
+                if (deviceType.Contains("Gamepad") || deviceType.Contains("Joystick") || 
+                    deviceType.Contains("Controller"))
                 {
-                    // Skip the intro on gamepad input and mark as handled
+                    // Mark as handled and trigger skip
                     inputEventArgs.Handled = true;
                     this.Dispatcher.BeginInvoke(new Action(() => SkipIntro()), DispatcherPriority.Input);
                 }
