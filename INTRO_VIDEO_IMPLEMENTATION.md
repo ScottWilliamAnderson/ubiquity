@@ -27,21 +27,24 @@ C# code-behind with comprehensive input handling:
 ✅ **Keyboard inputs blocked** - PreviewKeyDown event handler  
 ✅ **Mouse clicks blocked** - PreviewMouseDown event handler (captures all mouse buttons)  
 ✅ **Mouse wheel blocked** - PreviewMouseWheel handler  
-✅ **Gamepad inputs blocked** - Uses defensive approach to catch gamepad-triggered events  
+✅ **Gamepad inputs blocked** - InputManager.PreProcessInput handler for low-level device detection  
 
 ### Skip Functionality
 ✅ **Any button skips** - First input triggers skip, subsequent inputs are ignored  
 ✅ **Smooth animation** - 300ms fade-out with QuadraticEase easing  
 ✅ **Single skip only** - `isSkipping` flag prevents multiple skip attempts  
+✅ **Race condition prevention** - `isHiding` flag prevents simultaneous cleanup calls  
 
 ### User Experience
-✅ **Visual feedback** - "Press any button to skip" hint (60% opacity, bottom-right)  
-✅ **Professional appearance** - Non-intrusive text that doesn't distract from video  
+✅ **Visual feedback** - "Press any button to skip" hint with semi-transparent background  
+✅ **Professional appearance** - Rounded corners, 90% text opacity on 25% dark background  
+✅ **Improved readability** - Background ensures text is visible over any video content  
 
 ### Resource Management
 ✅ **Proper cleanup** - Video source cleared, MediaElement closed  
-✅ **Event unsubscription** - All event handlers removed to prevent memory leaks  
+✅ **Event unsubscription** - All event handlers removed (Preview + InputManager) to prevent memory leaks  
 ✅ **Graceful failures** - Try-catch blocks around critical operations  
+✅ **Race condition safety** - Multiple protection mechanisms prevent double-cleanup  
 
 ### Edge Cases Handled
 ✅ **Video not found** - Gracefully skips intro if video file doesn't exist  
@@ -70,10 +73,13 @@ The first existing path is used. If no file is found, the intro is skipped grace
 
 ## Gamepad Support
 
-While WPF doesn't have native gamepad events, this implementation uses a defensive approach:
-- Captures all mouse button events (which some gamepad systems route through)
-- Uses Preview events to catch input before Playnite's handlers
-- Blocks all input events with `Handled = true`
+This implementation provides comprehensive gamepad support through multiple layers:
+- **InputManager.PreProcessInput**: Low-level handler that detects gamepad/joystick devices by type
+- **Preview Events**: Captures input before Playnite's handlers  
+- **Device Type Detection**: Checks for "Gamepad" or "Joystick" in device type name
+- **Cancel + Skip**: Cancels the input event and triggers skip on gamepad detection
+
+The InputManager handler works with Playnate's input routing system to ensure gamepad inputs are properly captured and blocked during video playback.
 
 For Playnite-specific gamepad integration, the theme might need additional integration with Playnite's SDK, but this implementation provides maximum compatibility with standard input systems.
 
