@@ -14,7 +14,7 @@
             <DoubleAnimation Storyboard.TargetName="IntroContainer"
                            Storyboard.TargetProperty="Opacity"
                            To="0"
-                           Duration="0:0:0.3">
+                           Duration="0:0:0.2">
                 <DoubleAnimation.EasingFunction>
                     <QuadraticEase EasingMode="EaseInOut"/>
                 </DoubleAnimation.EasingFunction>
